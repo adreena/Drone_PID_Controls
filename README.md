@@ -32,22 +32,22 @@ With the proper mass, your simulation should look a little like this:
 <img src="animations/scenario1.gif" width="500"/>
 </p>
 
-#### Body Rate Control & Roll Pitch Control (scenario 2)
+### Scenario 2
 
 In this scenario, quad starts above the origin with a small initial rotation speed about its roll axis and the task is to stabilize its rotational motion and bring it back to level attitude.
 
-1. Body Rate Control
+##### Body Rate Control
 
- - `GenerateMotorCommands()`: Calculates the thrust for each quad using the total thurst, 3-axis moments and the arm length.
- - `BodyRateControl()`: Calculates the target 3-axis moment based on the target and the current body rate. The commanded roll, pitch, and yaw are collected by the body rate controller, and they are translated into the desired rotational accelerations along the axis in the body frame. 
-  * `kpPQR`: it gets the vehicle to stop spinning quickly without overshooting
-  * u_bar_p = kp_p * (p_target - p_current)
-  * u_bar_q = kp_q * (q_target - q_current)
-  * u_bar_r = kp_r * (r_target - r_current)
+  - `GenerateMotorCommands()`: Calculates the thrust for each quad using the total thurst, 3-axis moments and the arm length.
+  - `BodyRateControl()`: Calculates the target 3-axis moment based on the target and the current body rate. The commanded roll, pitch, and   yaw are collected by the body rate controller, and they are translated into the desired rotational accelerations along the axis in the body frame. 
+     * `kpPQR`: it gets the vehicle to stop spinning quickly without overshooting
+     * u_bar_p = kp_p * (p_target - p_current)
+     * u_bar_q = kp_q * (q_target - q_current)
+     * u_bar_r = kp_r * (r_target - r_current)
   
-With the angle ratio gain `p=90, q=100, r=10` the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  
+  With the angle ratio gain `p=90, q=100, r=10` the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  
 
-2. Roll Pitch control
+##### Roll Pitch control
 
  - `RollPitchControl()` is a P controller responsible for commanding the roll and pitch rates in the body frame, it receives the current attitude of the vehicle and sets the target rate of change of the given matrix elements R.
  - `kpBank` parameter minimize the settling time
@@ -59,17 +59,19 @@ With `kpBank=10` quad is able to level itself (as shown below), and its angle (R
 </p>
 
 
-### Position/velocity and yaw angle control (scenario 3)
+### Scenario 3
 
+##### Position Velocity Control
 Next, you will implement the position, altitude and yaw control for your quad.  For the simulation, you will use `Scenario 3`.  This will create 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
 
- - implement the code in the function `LateralPositionControl()`
- - implement the code in the function `AltitudeControl()`
- - tune parameters `kpPosZ` and `kpPosZ`
- - tune parameters `kpVelXY` and `kpVelZ`
+ - `LateralPositionControl()`
+ - `AltitudeControl()`
+ - `kpPosZ` and `kpPosZ`
+ - `kpVelXY` and `kpVelZ`
 
 If successful, the quads should be going to their destination points and tracking error should be going down (as shown below). However, one quad remains rotated in yaw.
 
+##### Yaw Control
  - implement the code in the function `YawControl()`
  - tune parameters `kpYaw` and the 3rd (z) component of `kpPQR`
 
@@ -79,10 +81,9 @@ Tune position control for settling time. Don’t try to tune yaw control too tig
 <img src="animations/scenario3.gif" width="500"/>
 </p>
 
-**Hint:**  For a second order system, such as the one for this quadcopter, the velocity gain (`kpVelXY` and `kpVelZ`) should be at least ~3-4 times greater than the respective position gain (`kpPosXY` and `kpPosZ`).
 
-### Non-idealities and robustness (scenario 4) ###
-
+###  Scenario 4
+Non-idealities and robustness
 In this part, we will explore some of the non-idealities and robustness of a controller.  For this simulation, we will use `Scenario 4`.  This is a configuration with 3 quads that are all are trying to move one meter forward.  However, this time, these quads are all a bit different:
  - The green quad has its center of mass shifted back
  - The orange vehicle is an ideal quad
