@@ -1,13 +1,3 @@
-# The C++ Project Readme #
-
-This is the readme for the C++ project.
-
-For easy navigation throughout this document, here is an outline:
-
- - [Development environment setup](#development-environment-setup)
- - [Simulator walkthrough](#simulator-walkthrough)
- - [The tasks](#the-tasks)
- - [Evaluation](#evaluation)
 
 
 ## Development Environment Setup ##
@@ -18,89 +8,13 @@ Once you have the code for the simulator, you will need to install the necessary
 
 Here are the setup and install instructions for each of the recommended IDEs for each different OS options:
 
-### Windows ###
 
-For Windows, the recommended IDE is Visual Studio.  Here are the steps required for getting the project up and running using Visual Studio.
-
-1. Download and install [Visual Studio](https://www.visualstudio.com/vs/community/)
-2. Select *Open Project / Solution* and open `<simulator>/project/Simulator.sln`
-3. From the *Project* menu, select the *Retarget solution* option and select the Windows SDK that is installed on your computer (this should have been installed when installing Visual Studio or upon opening of the project).
-4. Make sure platform matches the flavor of Windows you are using (x86 or x64). The platform is visible next to the green play button in the Visual Studio toolbar:
-
-![x64](x64.png)
-
-5. To compile and run the project / simulator, simply click on the green play button at the top of the screen.  When you run the simulator, you should see a single quadcopter, falling down.
-
-
-### OS X ###
-
-For Mac OS X, the recommended IDE is XCode, which you can get via the App Store.
-
-1. Download and install XCode from the App Store if you don't already have it installed.
-2. Open the project from the `<simulator>/project` directory.
-3. After opening project, you need to set the working directory:
-  1. Go to *(Project Name)* | *Edit Scheme*
-  2. In new window, under *Run/Debug* on left side, under the *Options* tab, set Working Directory to `$PROJECT_DIR` and check ‘use custom working directory’.
-  3. Compile and run the project. You should see a single quadcopter, falling down.
-
-
-### Linux ###
-
-For Linux, the recommended IDE is QtCreator.
-
-1. Download and install QtCreator.
-2. Open the `.pro` file from the `<simulator>/project` directory.
-3. Compile and run the project (using the tab `Build` select the `qmake` option.  You should see a single quadcopter, falling down.
-
-**NOTE:** You may need to install the GLUT libs using `sudo apt-get install freeglut3-dev`
-
-## Simulator Walkthrough ##
-
-Now that you have all the code on your computer and the simulator running, let's walk through some of the elements of the code and the simulator itself.
 
 ### The Code ###
 
 For the project, the majority of your code will be written in `src/QuadControl.cpp`.  This file contains all of the code for the controller that you will be developing.
 
-All the configuration files for your controller and the vehicle are in the `config` directory.  For example, for all your control gains and other desired tuning parameters, there is a config file called `QuadControlParams.txt` set up for you.  An import note is that while the simulator is running, you can edit this file in real time and see the affects your changes have on the quad!
 
-The syntax of the config files is as follows:
-
- - `[Quad]` begins a parameter namespace.  Any variable written afterwards becomes `Quad.<variablename>` in the source code.
- - If not in a namespace, you can also write `Quad.<variablename>` directly.
- - `[Quad1 : Quad]` means that the `Quad1` namespace is created with a copy of all the variables of `Quad`.  You can then overwrite those variables by specifying new values (e.g. `Quad1.Mass` to override the copied `Quad.Mass`).  This is convenient for having default values.
-
-You will also be using the simulator to fly some difference trajectories to test out the performance of your C++ implementation of your controller. These trajectories, along with supporting code, are found in the `traj` directory of the repo.
-
-
-### The Simulator ###
-
-In the simulator window itself, you can right click the window to select between a set of different scenarios that are designed to test the different parts of your controller.
-
-The simulation (including visualization) is implemented in a single thread.  This is so that you can safely breakpoint code at any point and debug, without affecting any part of the simulation.
-
-Due to deterministic timing and careful control over how the pseudo-random number generators are initialized and used, the simulation should be exactly repeatable. This means that any simulation with the same configuration should be exactly identical when run repeatedly or on different machines.
-
-Vehicles are created and graphs are reset whenever a scenario is loaded. When a scenario is reset (due to an end condition such as time or user pressing the ‘R’ key), the config files are all re-read and state of the simulation/vehicles/graphs is reset -- however the number/name of vehicles and displayed graphs are left untouched.
-
-When the simulation is running, you can use the arrow keys on your keyboard to impact forces on your drone to see how your controller reacts to outside forces being applied.
-
-#### Keyboard / Mouse Controls ####
-
-There are a handful of keyboard / mouse commands to help with the simulator itself, including applying external forces on your drone to see how your controllers reacts!
-
- - Left drag - rotate
- - X + left drag - pan
- - Z + left drag - zoom
- - arrow keys - apply external force
- - C - clear all graphs
- - R - reset simulation
- - Space - pause simulation
-
-
-
-
-### Testing it Out ###
 
 When you run the simulator, you'll notice your quad is falling straight down.  This is due to the fact that the thrusts are simply being set to:
 
@@ -125,31 +39,32 @@ For this project, you will be building a controller in C++.  You will be impleme
 
 You may find it helpful to consult the [Python controller code](https://github.com/udacity/FCND-Controls/blob/solution/controller.py) as a reference when you build out this controller in C++.
 
-#### Notes on Parameter Tuning
-1. **Comparison to Python**: Note that the vehicle you'll be controlling in this portion of the project has different parameters than the vehicle that's controlled by the Python code linked to above. **The tuning parameters that work for the Python controller will not work for this controller**
+#### Parameter Tuning
 
-2. **Parameter Ranges**: You can find the vehicle's control parameters in a file called `QuadControlParams.txt`. The default values for these parameters are all too small by a factor of somewhere between about 2X and 4X. So if a parameter has a starting value of 12, it will likely have a value somewhere between 24 and 48 once it's properly tuned.
 
-3. **Parameter Ratios**: In this [one-page document](https://www.overleaf.com/read/bgrkghpggnyc#/61023787/) you can find a derivation of the ratio of velocity proportional gain to position proportional gain for a critically damped double integrator system. The ratio of `kpV / kpP` should be 4.
+#### Body Rate Control & Roll Pitch Control (scenario 2)
 
-### Body rate and roll/pitch control (scenario 2) ###
+In this scenario, quad starts above the origin with a small initial rotation speed about its roll axis and the task is to stabilize its rotational motion and bring it back to level attitude.
 
-First, you will implement the body rate and roll / pitch control.  For the simulation, you will use `Scenario 2`.  In this scenario, you will see a quad above the origin.  It is created with a small initial rotation speed about its roll axis.  Your controller will need to stabilize the rotational motion and bring the vehicle back to level attitude.
+1. Body Rate Control
 
-To accomplish this, you will:
+ - `GenerateMotorCommands()`: Calculates the thrust for each quad using the total thurst, 3-axis moments and the arm length.
+ - `BodyRateControl()`: Calculates the target 3-axis moment based on the target and the current body rate. The commanded roll, pitch, and yaw are collected by the body rate controller, and they are translated into the desired rotational accelerations along the axis in the body frame. 
 
-1. Implement body rate control
+  `$p_{\text{error}} = p_c - p$
+   $\bar{u}_p= k_{p-p} p_{\text{error}}$
+   $q_{\text{error}} = q_c - q$
+   $\bar{u}_q= k_{p-q} q_{\text{error}}$
+   $r_{\text{error}} = r_c - r$`
 
- - implement the code in the function `GenerateMotorCommands()`
- - implement the code in the function `BodyRateControl()`
- - Tune `kpPQR` in `QuadControlParams.txt` to get the vehicle to stop spinning quickly but not overshoot
+$\bar{u}_r= k_{p-r} r_{\text{error}}$
+ - `kpPQR` parameter has the angle ratio gain p=90, q=100, r=10, it gets the vehicle to stop spinning quickly without overshooting
 
 If successful, you should see the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  Note that the vehicle will keep flying off quite quickly, since the angle is not yet being controlled back to 0.  Also note that some overshoot will happen due to motor dynamics!.
 
 If you come back to this step after the next step, you can try tuning just the body rate omega (without the outside angle controller) by setting `QuadControlParams.kpBank = 0`.
 
-2. Implement roll / pitch control
-We won't be worrying about yaw just yet.
+2. Roll Pitch control
 
  - implement the code in the function `RollPitchControl()`
  - Tune `kpBank` in `QuadControlParams.txt` to minimize settling time but avoid too much overshoot
@@ -161,7 +76,7 @@ If successful you should now see the quad level itself (as shown below), though 
 </p>
 
 
-### Position/velocity and yaw angle control (scenario 3) ###
+### Position/velocity and yaw angle control (scenario 3)
 
 Next, you will implement the position, altitude and yaw control for your quad.  For the simulation, you will use `Scenario 3`.  This will create 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
 
@@ -210,58 +125,3 @@ Now that we have all the working parts of a controller, you will put it all toge
 How well is your drone able to follow the trajectory?  It is able to hold to the path fairly well?
 
 
-### Extra Challenge 1 (Optional) ###
-
-You will notice that initially these two trajectories are the same. Let's work on improving some performance of the trajectory itself.
-
-1. Inspect the python script `traj/MakePeriodicTrajectory.py`.  Can you figure out a way to generate a trajectory that has velocity (not just position) information?
-
-2. Generate a new `FigureEightFF.txt` that has velocity terms
-Did the velocity-specified trajectory make a difference? Why?
-
-With the two different trajectories, your drones' motions should look like this:
-
-<p align="center">
-<img src="animations/scenario5.gif" width="500"/>
-</p>
-
-
-### Extra Challenge 2 (Optional) ###
-
-For flying a trajectory, is there a way to provide even more information for even better tracking?
-
-How about trying to fly this trajectory as quickly as possible (but within following threshold)!
-
-
-## Evaluation ##
-
-To assist with tuning of your controller, the simulator contains real time performance evaluation.  We have defined a set of performance metrics for each of the scenarios that your controllers must meet for a successful submission.
-
-There are two ways to view the output of the evaluation:
-
- - in the command line, at the end of each simulation loop, a **PASS** or a **FAIL** for each metric being evaluated in that simulation
- - on the plots, once your quad meets the metrics, you will see a green box appear on the plot notifying you of a **PASS**
-
-
-### Performance Metrics ###
-
-The specific performance metrics are as follows:
-
- - scenario 2
-   - roll should less than 0.025 radian of nominal for 0.75 seconds (3/4 of the duration of the loop)
-   - roll rate should less than 2.5 radian/sec for 0.75 seconds
-
- - scenario 3
-   - X position of both drones should be within 0.1 meters of the target for at least 1.25 seconds
-   - Quad2 yaw should be within 0.1 of the target for at least 1 second
-
-
- - scenario 4
-   - position error for all 3 quads should be less than 0.1 meters for at least 1.5 seconds
-
- - scenario 5
-   - position error of the quad should be less than 0.25 meters for at least 3 seconds
-
-## Authors ##
-
-Thanks to Fotokite for the initial development of the project code and simulator.
