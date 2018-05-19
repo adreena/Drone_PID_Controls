@@ -32,16 +32,6 @@ With the proper mass, your simulation should look a little like this:
 <img src="animations/scenario1.gif" width="500"/>
 </p>
 
-
-## The Tasks ##
-
-For this project, you will be building a controller in C++.  You will be implementing and tuning this controller in several steps.
-
-You may find it helpful to consult the [Python controller code](https://github.com/udacity/FCND-Controls/blob/solution/controller.py) as a reference when you build out this controller in C++.
-
-#### Parameter Tuning
-
-
 #### Body Rate Control & Roll Pitch Control (scenario 2)
 
 In this scenario, quad starts above the origin with a small initial rotation speed about its roll axis and the task is to stabilize its rotational motion and bring it back to level attitude.
@@ -50,31 +40,19 @@ In this scenario, quad starts above the origin with a small initial rotation spe
 
  - `GenerateMotorCommands()`: Calculates the thrust for each quad using the total thurst, 3-axis moments and the arm length.
  - `BodyRateControl()`: Calculates the target 3-axis moment based on the target and the current body rate. The commanded roll, pitch, and yaw are collected by the body rate controller, and they are translated into the desired rotational accelerations along the axis in the body frame. 
-
- $p_{\text{error}} = p_c - p$
+  * `kpPQR`: it gets the vehicle to stop spinning quickly without overshooting
+  * u_bar_p = kp_p * (p_target - p_current)
+  * u_bar_q = kp_q * (q_target - q_current)
+  * u_bar_r = kp_r * (r_target - r_current)
   
- $\bar{u}_p= k_{p-p} p_{\text{error}}$
- 
- $q_{\text{error}} = q_c - q$
- 
- $\bar{u}_q= k_{p-q} q_{\text{error}}$
- 
- $r_{\text{error}} = r_c - r$
-
-$\bar{u}_r= k_{p-r} r_{\text{error}}$
-
- - `kpPQR` parameter has the angle ratio gain p=90, q=100, r=10, it gets the vehicle to stop spinning quickly without overshooting
-
-If successful, you should see the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  Note that the vehicle will keep flying off quite quickly, since the angle is not yet being controlled back to 0.  Also note that some overshoot will happen due to motor dynamics!.
-
-If you come back to this step after the next step, you can try tuning just the body rate omega (without the outside angle controller) by setting `QuadControlParams.kpBank = 0`.
+With the angle ratio gain `p=90, q=100, r=10` the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  
 
 2. Roll Pitch control
 
- - implement the code in the function `RollPitchControl()`
- - Tune `kpBank` in `QuadControlParams.txt` to minimize settling time but avoid too much overshoot
+ - `RollPitchControl()` is a P controller responsible for commanding the roll and pitch rates in the body frame, it receives the current attitude of the vehicle and sets the target rate of change of the given matrix elements R.
+ - `kpBank` parameter minimize the settling time
 
-If successful you should now see the quad level itself (as shown below), though it’ll still be flying away slowly since we’re not controlling velocity/position!  You should also see the vehicle angle (Roll) get controlled to 0.
+With `kpBank=10` quad is able to level itself (as shown below), and its angle (Roll) gets controlled to 0.
 
 <p align="center">
 <img src="animations/scenario2.gif" width="500"/>
