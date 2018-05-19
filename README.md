@@ -51,14 +51,18 @@ In this scenario, quad starts above the origin with a small initial rotation spe
  - `GenerateMotorCommands()`: Calculates the thrust for each quad using the total thurst, 3-axis moments and the arm length.
  - `BodyRateControl()`: Calculates the target 3-axis moment based on the target and the current body rate. The commanded roll, pitch, and yaw are collected by the body rate controller, and they are translated into the desired rotational accelerations along the axis in the body frame. 
 
-  $p_{\text{error}} = p_c - p$
+ $p_{\text{error}} = p_c - p$
   
-   $\bar{u}_p= k_{p-p} p_{\text{error}}$
-   $q_{\text{error}} = q_c - q$
-   $\bar{u}_q= k_{p-q} q_{\text{error}}$
-   $r_{\text{error}} = r_c - r$
+ $\bar{u}_p= k_{p-p} p_{\text{error}}$
+ 
+ $q_{\text{error}} = q_c - q$
+ 
+ $\bar{u}_q= k_{p-q} q_{\text{error}}$
+ 
+ $r_{\text{error}} = r_c - r$
 
 $\bar{u}_r= k_{p-r} r_{\text{error}}$
+
  - `kpPQR` parameter has the angle ratio gain p=90, q=100, r=10, it gets the vehicle to stop spinning quickly without overshooting
 
 If successful, you should see the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  Note that the vehicle will keep flying off quite quickly, since the angle is not yet being controlled back to 0.  Also note that some overshoot will happen due to motor dynamics!.
