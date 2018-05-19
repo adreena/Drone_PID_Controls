@@ -62,10 +62,25 @@ With `kpBank=10` quad is able to level itself (as shown below), and its angle (R
 ### Scenario 3
 
 ##### Position Velocity Control
-Next, you will implement the position, altitude and yaw control for your quad.  For the simulation, you will use `Scenario 3`.  This will create 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
 
- - `LateralPositionControl()`
- - `AltitudeControl()`
+This section controls quad's position, altitude and yaw.  For this scenario, there are 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
+
+ - `LateralPositionControl()`: Calculates the target horizontal acceleration based on target lateral position/velocity/acceleration and current pose
+  // HINTS: 
+  //  - use the gain parameters kpPosXY and kpVelXY
+  //  - make sure you limit the maximum horizontal velocity and acceleration
+  //    to maxSpeedXY and maxAccelXY
+ - `AltitudeControl()`: Calculates the target thrust based on altitude setpoint, actual altitude, vertical velocity setpoint, actual vertical velocity, and a vertical acceleration feed-forward command
+
+  //   return a collective thrust command in [N]
+
+  // HINTS: 
+  //  - we already provide rotation matrix R: to get element R[1,2] (python) use R(1,2) (C++)
+  //  - you'll need the gain parameters kpPosZ and kpVelZ
+  //  - maxAscentRate and maxDescentRate are maximum vertical speeds. Note they're both >=0!
+  //  - make sure to return a force, not an acceleration
+  //  - remember that for an upright quad in NED, thrust should be HIGHER if the desired Z acceleration is LOWER
+
  - `kpPosZ` and `kpPosZ`
  - `kpVelXY` and `kpVelZ`
 
