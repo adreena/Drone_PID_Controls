@@ -1,35 +1,21 @@
 
 
-## Development Environment Setup ##
+## Project 
 
-Regardless of your development platform, the first step is to download or clone this repository.
-
-Once you have the code for the simulator, you will need to install the necessary compiler and IDE necessary for running the simulator.
-
-Here are the setup and install instructions for each of the recommended IDEs for each different OS options:
-
-
-
-### The Code ###
-
-For the project, the majority of your code will be written in `src/QuadControl.cpp`.  This file contains all of the code for the controller that you will be developing.
-
-
-
-When you run the simulator, you'll notice your quad is falling straight down.  This is due to the fact that the thrusts are simply being set to:
-
-```
-QuadControlParams.Mass * 9.81 / 4
-```
-
-Therefore, if the mass doesn't match the actual mass of the quad, it'll fall down.  Take a moment to tune the `Mass` parameter in `QuadControlParams.txt` to make the vehicle more or less stay in the same spot.
-
-Note: if you want to come back to this later, this scenario is "1_Intro".
-
-With the proper mass, your simulation should look a little like this:
+The goal of this project is to control a drone in the 3D environment. Here is the architecture of the controller which consists of altitude controller, position controller, and attitude controller:
 
 <p align="center">
-<img src="animations/scenario1.gif" width="500"/>
+<img src="animations/control1.png" width="500"/>
+<img src="animations/control2.png" width="500"/>
+</p>
+
+### Scenario 1
+
+
+To keep quad from falling straight down mass is set to 0.5
+
+<p align="center">
+<img src="animations/s1.gif" width="500"/>
 </p>
 
 ### Scenario 2
@@ -55,7 +41,7 @@ In this scenario, quad starts above the origin with a small initial rotation spe
 With `kpBank=10` quad is able to level itself (as shown below), and its angle (Roll) gets controlled to 0.
 
 <p align="center">
-<img src="animations/scenario2.gif" width="500"/>
+<img src="animations/s2.gif" width="500"/>
 </p>
 
 
@@ -63,34 +49,18 @@ With `kpBank=10` quad is able to level itself (as shown below), and its angle (R
 
 ##### Position Velocity Control
 
-This section controls quad's position, altitude and yaw.  For this scenario, there are 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
+ - `LateralPositionControl()`: is a PD Controller to calculate the target horizontal acceleration based on target lateral position/velocity/acceleration and current pose. The drone generates lateral acceleration by changing the body orientation which results in non-zero thrust in the desired direction. Horizontal velocity and acceleration should remain wihin the limits of maxSpeedXY and maxAccelXY.
+ - Gain parameters `kpPosXY = 2.5` and `kpPosZ = 5` `kpVelXY = 10` and `kpVelZ = 20`, 
+ - `AltitudeControl()`: Calculates the target thrust based on altitude setpoint, actual altitude, vertical velocity setpoint, actual vertical velocity, and a vertical acceleration feed-forward command.
+ 
+As shown below quads go to their destination points and their tracking error are going down.
 
- - `LateralPositionControl()`: Calculates the target horizontal acceleration based on target lateral position/velocity/acceleration and current pose
-  // HINTS: 
-  //  - use the gain parameters kpPosXY and kpVelXY
-  //  - make sure you limit the maximum horizontal velocity and acceleration
-  //    to maxSpeedXY and maxAccelXY
- - `AltitudeControl()`: Calculates the target thrust based on altitude setpoint, actual altitude, vertical velocity setpoint, actual vertical velocity, and a vertical acceleration feed-forward command
-
-  //   return a collective thrust command in [N]
-
-  // HINTS: 
-  //  - we already provide rotation matrix R: to get element R[1,2] (python) use R(1,2) (C++)
-  //  - you'll need the gain parameters kpPosZ and kpVelZ
-  //  - maxAscentRate and maxDescentRate are maximum vertical speeds. Note they're both >=0!
-  //  - make sure to return a force, not an acceleration
-  //  - remember that for an upright quad in NED, thrust should be HIGHER if the desired Z acceleration is LOWER
-
- - `kpPosZ` and `kpPosZ`
- - `kpVelXY` and `kpVelZ`
-
-If successful, the quads should be going to their destination points and tracking error should be going down (as shown below). However, one quad remains rotated in yaw.
 
 ##### Yaw Control
- - implement the code in the function `YawControl()`
- - tune parameters `kpYaw` and the 3rd (z) component of `kpPQR`
+A P Controller is used to control the drone's yaw by decoupling from the other directions. A P controller.
 
-Tune position control for settling time. Don’t try to tune yaw control too tightly, as yaw control requires a lot of control authority from a quadcopter and can really affect other degrees of freedom.  This is why you often see quadcopters with tilted motors, better yaw authority!
+ - `YawControl()`: Calculate the target yaw rate to control yaw to yawCmd
+ - `kpYaw = 5` and the 3rd (z) component of `kpPQR -> R = 10`
 
 <p align="center">
 <img src="animations/scenario3.gif" width="500"/>
@@ -98,29 +68,18 @@ Tune position control for settling time. Don’t try to tune yaw control too tig
 
 
 ###  Scenario 4
-Non-idealities and robustness
-In this part, we will explore some of the non-idealities and robustness of a controller.  For this simulation, we will use `Scenario 4`.  This is a configuration with 3 quads that are all are trying to move one meter forward.  However, this time, these quads are all a bit different:
+
+In this scenario parameters are tweaked to control non-ideal situations and robustness of controllers for 3 different quads:
  - The green quad has its center of mass shifted back
  - The orange vehicle is an ideal quad
  - The red vehicle is heavier than usual
 
-1. Run your controller & parameter set from Step 3.  Do all the quads seem to be moving OK?  If not, try to tweak the controller parameters to work for all 3 (tip: relax the controller).
+* `AltitudeControl()`: added integrated altitude Error to the controller to help with the different-mass vehicle 
+* `KiPosZ = 20`
 
-2. Edit `AltitudeControl()` to add basic integral control to help with the different-mass vehicle.
-
-3. Tune the integral control, and other control parameters until all the quads successfully move properly.  Your drones' motion should look like this:
+As shown below quads move successfully and all cases pass.
 
 <p align="center">
 <img src="animations/scenario4.gif" width="500"/>
 </p>
-
-
-### Tracking trajectories ###
-
-Now that we have all the working parts of a controller, you will put it all together and test it's performance once again on a trajectory.  For this simulation, you will use `Scenario 5`.  This scenario has two quadcopters:
- - the orange one is following `traj/FigureEight.txt`
- - the other one is following `traj/FigureEightFF.txt` - for now this is the same trajectory.  For those interested in seeing how you might be able to improve the performance of your drone by adjusting how the trajectory is defined, check out **Extra Challenge 1** below!
-
-How well is your drone able to follow the trajectory?  It is able to hold to the path fairly well?
-
 
