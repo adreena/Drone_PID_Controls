@@ -2,8 +2,12 @@
 
 ## Project 
 
-To control a drone in the 3D environment. From lesson, you are already familiar with the architecture of the controller. It consists of altitude controller, position controller, and attitude controller.
+The goal of this project is to control a drone in the 3D environment. Here is the architecture of the controller which consists of altitude controller, position controller, and attitude controller:
 
+<p align="center">
+<img src="animations/control1.png" width="500"/>
+<img src="animations/control2.png" width="500"/>
+</p>
 
 ### Scenario 1
 
