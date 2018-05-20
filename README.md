@@ -63,7 +63,7 @@ A P Controller is used to control the drone's yaw by decoupling from the other d
  - `kpYaw = 5` and the 3rd (z) component of `kpPQR -> R = 10`
 
 <p align="center">
-<img src="animations/3.gif" width="500"/>
+<img src="animations/s3.gif" width="500"/>
 </p>
 
 
