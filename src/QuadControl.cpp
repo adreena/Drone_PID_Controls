@@ -99,7 +99,7 @@ V3F QuadControl::BodyRateControl(V3F pqrCmd, V3F pqr)
 
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
+//
 //    float uBarp =kpPQR[0] * (pqrCmd[0] - pqr[0]);
 //    float uBarq =kpPQR[1] * (pqrCmd[1] - pqr[1]);
 //    float uBarr =kpPQR[2] * (pqrCmd[2] - pqr[2]);
@@ -223,15 +223,14 @@ V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel
   V3F accelCmd = accelCmdFF;
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-//    if (velCmd.mag() > maxSpeedXY){
-//        velCmd = velCmd.norm() * maxSpeedXY;
-//    }
+    if (velCmd.mag() > maxSpeedXY){
+        velCmd = velCmd.norm() * maxSpeedXY;
+    }
     V3F velocity = kpPosXY * (posCmd - pos) + velCmd;
     accelCmd =  kpVelXY * (velocity - vel) + accelCmd;
-//    accelCmd.y = kpPosXY * (posCmd.y - pos.y) + kpVelXY * (velCmd.y - vel.x) + accelCmdFF.y;
-//    if (accelCmd.mag() > maxAccelXY){
-//        accelCmd = accelCmd.norm() * maxAccelXY;
-//    }
+    if (accelCmd.mag() > maxAccelXY){
+        accelCmd = accelCmd.norm() * maxAccelXY;
+    }
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
@@ -254,21 +253,7 @@ float QuadControl::YawControl(float yawCmd, float yaw)
   float yawRateCmd=0;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
   
-    // ensure the target is in range 0, 2pi
-    
-//    if(yawCmd < 0){
-//      yawCmd = fmodf(yawCmd, -2*M_PI);
-//    }else{
-//      yawCmd = fmodf(yawCmd, 2.0*M_PI);
-////    }
-//    float yawError = (yawCmd - yaw);
-////    if (yawError > M_PI){
-////        yawError -= 2*M_PI;
-////    }else if (yawError < -M_PI){
-////        yawError += 2*M_PI;
-////    }
-//    yawError = fmodf(yawError, 2.0* M_PI);
-//    yawRateCmd = kpYaw * yawError;
+    // checking the target in range 0, 2pi
 
     float yaw_cmd_2_pi = 0;
     if ( yawCmd > 0 ) {
