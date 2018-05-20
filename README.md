@@ -63,7 +63,7 @@ A P Controller is used to control the drone's yaw by decoupling from the other d
  - `kpYaw = 5` and the 3rd (z) component of `kpPQR -> R = 10`
 
 <p align="center">
-<img src="animations/scenario3.gif" width="500"/>
+<img src="animations/3.gif" width="500"/>
 </p>
 
 
@@ -80,6 +80,12 @@ In this scenario parameters are tweaked to control non-ideal situations and robu
 As shown below quads move successfully and all cases pass.
 
 <p align="center">
-<img src="animations/scenario4.gif" width="500"/>
+<img src="animations/s4.gif" width="500"/>
 </p>
 
+###  Scenario 5
+
+Putting it all together and testing the controllers with two quadcopters shows that drones are able to stablize itself and follow trajectories.
+<p align="center">
+<img src="animations/s5.gif" width="500"/>
+</p>
